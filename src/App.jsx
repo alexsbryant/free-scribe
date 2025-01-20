@@ -7,6 +7,8 @@ import FileDisplay from './components/FileDisplay';
 function App() {
   const [file, setFile] = useState(null);
   const [audioStream, setAudioStream] = useState(null);
+  const [output, setOutput] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const isAudioAvailable = file || audioStream;
 
