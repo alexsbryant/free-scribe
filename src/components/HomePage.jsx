@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 function HomePage(props) {
     const { setAudioStream, setFile } = props;
@@ -12,8 +12,7 @@ function HomePage(props) {
     const mineType = 'audio.webm';
 
     async function startRecording() {
-        let tempStream
-
+        let tempStream;
         console.log('Start recording');
 
         try {
