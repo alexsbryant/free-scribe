@@ -5,6 +5,7 @@ import Header from './components/Header';
 import FileDisplay from './components/FileDisplay';
 import Information from './components/Information';
 import Transcribing from './components/Transcribing';
+import { MessageTypes } from './utils/presets';
 
 function App() {
   const [file, setFile] = useState(null);
@@ -68,6 +69,18 @@ function App() {
 
   }
   
+
+  async function handleFormSubmission() {
+    if (!file && !audioStream) { return };
+    let audio = await readAudioForm(file ? file : audioStream);
+    const model_name = `openai/whisper-tiny.en`;
+  
+    worker.current.postMessage({
+      type: MessageTypes.INFERENCE_REQUEST,
+      audio,
+      model_name
+    })
+  }
 /*   useEffect(() => {
     console.log(audioStream)
   }, [audioStream]); */
