@@ -16,8 +16,10 @@ function FileDisplay(props) {
             <div className='flex items-center justify-between gap-4'>
                 <button onClick={handleAudioReset} className='text-slate-400 
                 hover:text-blue-600 duration-200'>Reset</button>
-                <button className='specialBtn px-4 py-2 rounded-lg text-blue-400'>
+                <button className='specialBtn px-3 py-2 rounded-lg text-blue-400
+                flex items-center gap-2 font-medium'>
                     <p>Transcribe</p>
+                    <i class="fa-solid fa-pen-nib"></i>
                 </button>
             </div>
         </main>
