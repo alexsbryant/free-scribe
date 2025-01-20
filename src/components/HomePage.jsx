@@ -109,12 +109,4 @@ function HomePage(props) {
     )
 };
 
-/*
-    NOTES: 
-        -Mic diassapearing, not turning 'rose',
-        -Seconds showing as 0s before recording begins,
-        -duration state did not reset
-*/
-
-
 export default HomePage;
