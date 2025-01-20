@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 function Translation() {
   return (
@@ -6,4 +6,4 @@ function Translation() {
   )
 }
 
-export default Translation
+export default Translation;
