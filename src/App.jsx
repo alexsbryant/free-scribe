@@ -59,14 +59,13 @@ function App() {
 
   }, []);
 
-  async function readAudioFrom(file) {
-    const samping_rate = 16000;
-    const audioCTX = new AudioContext({sampleRate: samping_rate});
+  async function readAudioForm(file) {
+    const sampling_rate = 16000;
+    const audioCTX = new AudioContext({sampleRate: sampling_rate});
     const response = await file.arrayBuffer();
     const decoded = await audioCTX.decodeAudioData(response);
     const audio = decoded.getChannelData(0);
     return audio;
-
   }
   
 
