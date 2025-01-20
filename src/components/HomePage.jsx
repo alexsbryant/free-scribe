@@ -41,7 +41,7 @@ function HomePage(props) {
             localAudioChunks.push(event.data);
         }
         setAudioChunks(localAudioChunks);
-        console.log(audioChunks);
+        //console.log(audioChunks);
     };
 
     async function stopRecording() {
@@ -67,9 +67,9 @@ function HomePage(props) {
         return () => clearInterval(interval);
     })
 
-    useEffect(() => {
+  /*   useEffect(() => {
         console.log(recStatus)
-      }, [recStatus]);
+      }, [recStatus]); */
 
     return (      
         <main className='flex-1 p-4 flex flex-col gap-3 sm:gap-4 
