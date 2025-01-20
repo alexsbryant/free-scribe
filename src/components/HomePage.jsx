@@ -13,7 +13,7 @@ function HomePage(props) {
 
     async function startRecording() {
         let tempStream;
-        console.log('Start recording');
+        console.log('Started recording');
 
         try {
             const streamData = navigator.mediaDevices.getUserMedia({
@@ -35,8 +35,8 @@ function HomePage(props) {
         mediaRecorder.current.start();
         let localAudioChunks = [];
         mediaRecorder.current.ondataavailable = (event) => {
-            if (typeof event.data === 'undefined') { return }
-            if (event.data.size === 0) { return }
+            if (typeof event.data === 'undefined') { return };
+            if (event.data.size === 0) { return };
             localAudioChunks.push(event.data);
         }
         setAudioChunks(localAudioChunks);
@@ -44,15 +44,26 @@ function HomePage(props) {
 
     async function stopRecording() {
         setRecStatus('inactive');
-        console.log('Stop recording');
+        console.log('Stopped recording');
 
         mediaRecorder.current.stop;
         mediaRecorder.current.onstop = () => {
             const audioBlob = new Blob(audioChunks, { type: mineType });
             setAudioStream(audioBlob);
             setAudioChunks([]);
+            setDuration(0);
         };
-    }
+    };
+
+    useEffect(() => {
+        if (recStatus === 'inactive') { return };
+
+        const interval = setInterval(() => {
+            setDuration(curr => curr + 1)
+        }, 1000);
+
+        return () => clearInterval(interval);
+    })
 
     return (
         <main className='flex-1 p-4 flex flex-col gap-3 sm:gap-4 md:gap-5 
@@ -62,10 +73,20 @@ function HomePage(props) {
             <h3 className='font-medium md:text-lg'>Record <span
                 className='text-blue-400'>&rarr;</span> Transcribe <span
                     className='text-blue-400'>&rarr;</span>Translate</h3>
-            <button className='flex specialBtn px-4 py-2 rounded-xl items-center 
+            <button onClick={recStatus === 'recording' ? stopRecording : startRecording}
+            className='flex specialBtn px-4 py-2 rounded-xl items-center 
             text-base justify-between gap-4 mx-auto w-72 max-w-full my-4'>
-                <p className='text-blue-400'>Record</p>
-                <i className="fa-solid fa-microphone"></i>
+                <p className='text-blue-400'>
+                    {recStatus === 'inactive' ? 'Record' : `Stop recording`}</p>
+                <div className='flex items-center gap-2'>
+                    {duration !== 0 && (
+                        <p className='text-sm'>{duration}s</p>
+                    )}
+                    <i className={"fa-solid duration-200 fa-microphone " + 
+                        (recStatus === 'recording' ? ' text-rose-300' : ""
+                        )}></i>
+                </div>
+                
             </button>
             <p className='text-base'>Or <label className='text-blue-400 cursor-pointer 
             hover:text-blue-600 duration-200'>Upload
@@ -79,5 +100,13 @@ function HomePage(props) {
         </main>
     )
 };
+
+/*
+    NOTES: 
+        -Mic diassapearing, not turning 'rose',
+        -Seconds showing as 0s before recording begins,
+        -duration state did not reset
+*/
+
 
 export default HomePage;
