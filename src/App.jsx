@@ -96,7 +96,8 @@ function App() {
           <FileDisplay 
             file={file} 
             audioStream={audioStream} 
-            handleAudioReset={handleAudioReset} />
+            handleAudioReset={handleAudioReset}
+            handleFormSubmission={handleFormSubmission} />
         ) : ( 
           <HomePage 
           setFile={setFile} 

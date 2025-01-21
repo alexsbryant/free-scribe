@@ -1,4 +1,4 @@
-import {pipeline} from '@xenova/transformers'
+import { pipeline } from '@xenova/transformers'
 import { MessageTypes } from './presets'
 
 class MyTranscriptionPipeline {
@@ -22,7 +22,7 @@ self.addEventListener('message', async (event) => {
     }
 })
 
-async function transcribe() {
+async function transcribe(audio) {
     sendLoadingMessage('loading')
 
     let pipeline
@@ -38,7 +38,6 @@ async function transcribe() {
     const stride_length_s = 5
 
     const generationTracker = new GenerationTracker(pipeline, stride_length_s)
-
     await pipeline(audio, {
         top_k: 0,
         do_sample: false,
@@ -46,15 +45,15 @@ async function transcribe() {
         stride_length_s,
         return_timestamps: true,
         callback_function: generationTracker.callbackFunction.bind(generationTracker),
-        chunk_callback: generationTracker.chunk_callback.bind(generationTracker)
+        chunk_callback: generationTracker.chunkCallback.bind(generationTracker)
     })
     generationTracker.sendFinalResult()
 }
 
 async function load_model_callback(data) {
-    const {status} = data
+    const { status } = data
     if (status === 'progress') {
-        const {file, progress, loaded, total} = data
+        const { file, progress, loaded, total } = data
         sendDownloadingMessage(file, progress, loaded, total)
     }
 }
@@ -77,7 +76,7 @@ async function sendDownloadingMessage(file, progress, loaded, total) {
 }
 
 class GenerationTracker {
-    constructor(pipline, stride_length_s) {
+    constructor(pipeline, stride_length_s) {
         this.pipeline = pipeline
         this.stride_length_s = stride_length_s
         this.chunks = []
@@ -87,7 +86,7 @@ class GenerationTracker {
     }
 
     sendFinalResult() {
-        self.postMessage({type: MessageTypes.INFERENCE_DONE})
+        self.postMessage({ type: MessageTypes.INFERENCE_DONE })
     }
 
     callbackFunction(beams) {
@@ -96,14 +95,14 @@ class GenerationTracker {
             return
         }
 
-        const bestBeam = beams
+        const bestBeam = beams[0]
         let text = this.pipeline.tokenizer.decode(bestBeam.output_token_ids, {
             skip_special_tokens: true
         })
 
         const result = {
             text,
-            start: this.getLastChunkTimestamp,
+            start: this.getLastChunkTimestamp(),
             end:undefined
         }
 
@@ -112,8 +111,9 @@ class GenerationTracker {
 
     chunkCallback(data) {
         this.chunks.push(data)
-        const [text, {chunks}] = this.pipeline.tokenizer._decode_asr(
-            this.chunks, {
+        const [text, { chunks }] = this.pipeline.tokenizer._decode_asr(
+            this.chunks, 
+            {
                 time_precision: this.time_precision,
                 return_timestamps: true,
                 force_full_sequence: false
@@ -121,7 +121,7 @@ class GenerationTracker {
         )
 
         this.processed_chunks = chunks.map((chunk, index) => {
-            return this.processed_chunks(chunk, index)
+            return this.processChunk(chunk, index)
         })
 
         createResultMessage(
@@ -135,9 +135,10 @@ class GenerationTracker {
         }
     }
 
-    processed_chunks(chunk, index) {
-        const {text, timestamp} = chunk
+    processChunk(chunk, index) {
+        const { text, timestamp } = chunk
         const [start, end] = timestamp
+        
         return {
             index,
             text: `${text.trim()}`,
