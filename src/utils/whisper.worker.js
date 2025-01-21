@@ -23,5 +23,56 @@ self.addEventListener('message', async (event) => {
 })
 
 async function transcribe() {
+    sendLoadingMessage('loading')
+
+    let pipeline
     
+    try {
+        pipeline = await MyTranscriptionPipeline.getInstance(load_model_callback)
+    } catch (err) {
+        console.log(err.message)
+    }
+
+    sendLoadingMessage('success')
+
+    const stride_length_s = 5
+
+    const generationTracker = new GenerationTracker(pipeline, stride_length_s)
+
+    await pipeline(audio, {
+        top_k: 0,
+        do_sample: false,
+        chunk_length: 30,
+        stride_length_s,
+        return_timestamps: true,
+        callback_function: generationTracker.callbackFunction.bind(generationTracker),
+        chunk_callback: generationTracker.chunk_callback.bind(generationTracker)
+    })
+    generationTracker.sendFinalResult()
 }
+
+async function load_model_callback(data) {
+    const {status} = data
+    if (status === 'progress') {
+        const {file, progress, loaded, total} = data
+        sendDownloadingMessage(file, progress, loaded, total)
+    }
+}
+
+function sendLoadingMessage(status) {
+    self.postMessage({
+        type: MessageTypes.LOADING,
+        status,
+    })
+}
+
+async function sendDownloadingMessage(file, progress, loaded, total) {
+    self.postMessage({
+        type: MessageTypes.DOWNLOADING,
+        file,
+        progress,
+        loaded,
+        total
+    })
+}
+
