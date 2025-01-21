@@ -2,7 +2,7 @@ import { pipeline } from '@xenova/transformers'
 import { MessageTypes } from './presets'
 
 class MyTranscriptionPipeline {
-    static task = 'automatic-speach-recognition'
+    static task = 'automatic-speech-recognition'
     static model = 'openai/whisper-tiny.en'
     static instance = null
 
@@ -26,7 +26,7 @@ async function transcribe(audio) {
     sendLoadingMessage('loading')
 
     let pipeline
-    
+
     try {
         pipeline = await MyTranscriptionPipeline.getInstance(load_model_callback)
     } catch (err) {
@@ -48,6 +48,7 @@ async function transcribe(audio) {
         chunk_callback: generationTracker.chunkCallback.bind(generationTracker)
     })
     generationTracker.sendFinalResult()
+
 }
 
 async function load_model_callback(data) {
@@ -138,7 +139,7 @@ class GenerationTracker {
     processChunk(chunk, index) {
         const { text, timestamp } = chunk
         const [start, end] = timestamp
-        
+
         return {
             index,
             text: `${text.trim()}`,

@@ -44,6 +44,7 @@ function App() {
           break; 
         case 'RESULT':
           setOutput(e.data.results);
+          console.log(e.data.results);
           break;
         case 'INFERENCE_DONE':
           setFinished(true);
@@ -80,9 +81,6 @@ function App() {
       model_name
     })
   }
-/*   useEffect(() => {
-    console.log(audioStream)
-  }, [audioStream]); */
 
   return (
     <div className="flex flex-col max-w-[1000px] mx-auto w-full">
